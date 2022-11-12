@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed;
+    [SerializeField] private float jumpForce = 15f;
     private Rigidbody2D body;
     private bool grounded;
 
@@ -11,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
 
     }
+
+   
 
     private void Update()
     {
@@ -31,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     {
         body.velocity = new Vector2(body.velocity.x, speed);
         grounded = false;
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
