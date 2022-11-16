@@ -4,24 +4,52 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-   [SerializeField] private float speed;
-   private float currentposX;
-   private Vector3 velocity=Vector3.zero;
+    public float dumping = 1.5f;
+    public Vector2 offset = new Vector2(2f, 1f);
+    public bool isLeft;
+    private Transform player;
+    private int lastX;
 
-   [SerializeField] private transform player;
-   [SerializeField] private float aheadDistance;
-   [SerializeField] private float cameraSpeed;
-   private float lookAhead;
+    void Start()
+    {
+        offset = new Vector2(Mathf.Abs(offset.x), offset.y);
+        FindPlayer(isLeft);
+    }
 
-   private void Update()
-   {
-    //transform.position=Vector3.SmoothDamp(transform.position, new Vector3(currentposX, transform.position.y, transform.position.z), ref velocity, speed*Time.deltaTime);
-    transform.position=new Vector3(player.position.x+lookAhead, transform.position.y, transform.position.z);
-    lookAhead=Mathf.Lerp(lookAhead, (aheadDistance*player.localScale.x), Time.deltaTime*cameraSpeed);
-   }
+    public void FindPlayer(bool playerIsLeft)
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        lastX = Mathf.RoundToInt(player.position.x);
+        if (playerIsLeft)
+        {
+            transform.position = new Vector3(player.position.x - offset.x, player.position.y - offset.y, transform.position.z);
+        }
+        else
+        {
+            transform.position = new Vector3(player.position.x + offset.x, player.position.y + offset.y, transform.position.z);
+        }
+    }
 
-   public void MoveToNewLocation(Transform _newLocation)
-   {
-    currentposX=_newLocation.position.x;
-   }
+    void Update()
+    {
+        if (player)
+        {
+            int currentX = Mathf.RoundToInt(player.position.x);
+            if (currentX > lastX) isLeft = false; else if (currentX < lastX) isLeft = true;
+            lastX = Mathf.RoundToInt(player.position.x);
+
+            Vector3 target;
+            if (isLeft)
+            {
+                target = new Vector3(player.position.x - offset.x, player.position.y + offset.y, transform.position.z);
+            }
+            else
+            {
+                target = new Vector3(player.position.x + offset.x, player.position.y + offset.y, transform.position.z);
+            }
+
+            Vector3 currentPosition = Vector3.Lerp(transform.position, target, dumping = Time.deltaTime);
+            transform.position = currentPosition;
+        }
+    }
 }
